@@ -1,17 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document: 
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
-```{r setoptions, echo = FALSE}
-# Set global option to avoid scientific notation for relatively small numbers
-options(scipen = 10, digits = 2)
-```
+
 
 ## Loading and preprocessing the data
-```{r echo=TRUE}
+
+```r
 # Assume data file is present in current directory as "activity.csv"
 activityData <- read.csv("activity.csv", 
                          stringsAsFactors = FALSE)
@@ -19,7 +12,8 @@ activityData$date <- as.Date(activityData$date)
 ```
 
 ## What is mean total number of steps taken per day?
-```{r echo=TRUE}
+
+```r
 stepsPerDay <- aggregate(steps ~ date, 
                          activityData, 
                          sum)
@@ -27,17 +21,22 @@ hist(stepsPerDay$steps,
      col = "green", 
      main = "Histogram of Total Steps Per Day", 
      xlab = "Total Steps Per Day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 meanSteps <- mean(stepsPerDay$steps)
 medianSteps <- median(stepsPerDay$steps)
 ```
 
-#### The mean of total number of steps is `r meanSteps` 
+#### The mean of total number of steps is 10766.19 
 
-#### The median of total number of steps is `r medianSteps`
+#### The median of total number of steps is 10765
 
 ## What is the average daily activity pattern?
-```{r echo=TRUE}
+
+```r
 stepsPerInterval <- aggregate(steps ~ interval, 
                               activityData, 
                               sum)
@@ -46,6 +45,11 @@ plot(stepsPerInterval$interval,
      type = "l", 
      xlab = "Interval", 
      ylab = "Mean Number of Steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 # Find out the logical vector indicating which interval has maximum steps
 areStepsMax <- sapply(stepsPerInterval$steps, 
                       function(x) {
@@ -55,18 +59,20 @@ areStepsMax <- sapply(stepsPerInterval$steps,
 maxStepsInterval <- stepsPerInterval$interval[which(areStepsMax)]
 ```
 
-#### The max steps are in interval(s): `r maxStepsInterval`
+#### The max steps are in interval(s): 835
 
 
 ## Imputing missing values
-```{r echo=TRUE}
+
+```r
 areValuesNa <- sapply(activityData$steps, 
                       function(x) is.na(x))
 totalMissingValues <- length(which(areValuesNa))
 ```
-#### Total number of missing values are `r totalMissingValues`
+#### Total number of missing values are 2304
 
-```{r echo=TRUE, warning=FALSE, message = FALSE}
+
+```r
 # Create a copy of activity data and impute missing value in new data. Use mean values for that interval to replace missing values
 library(dplyr)
 newActivityData <- activityData
@@ -93,22 +99,27 @@ hist(newStepsPerDay$steps,
      col = "blue", 
      main = "Histogram of Total Steps Per Day", 
      xlab = "Total Steps Per Day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
 newMeanSteps <- mean(newStepsPerDay$steps)
 newMedianSteps <- median(newStepsPerDay$steps)
 ```
 
-#### The mean of total number of steps in imputed data is `r newMeanSteps` 
+#### The mean of total number of steps in imputed data is 10765.64 
 
-#### The median of total number of steps in imputed data is `r newMedianSteps`
+#### The median of total number of steps in imputed data is 10762
 
-#### The difference between mean of raw and imputed data is `r meanSteps - newMeanSteps`, which is not significant.
+#### The difference between mean of raw and imputed data is 0.55, which is not significant.
 
-#### The difference between median of raw and imputed data is `r medianSteps - newMedianSteps`, which is not significant.
+#### The difference between median of raw and imputed data is 3, which is not significant.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r echo=TRUE, warning = FALSE, message = FALSE}
+
+```r
 library(lattice)
 weekendNames <- c('Saturday', 'Sunday')
 newActivityData$dayType <- 
@@ -128,4 +139,6 @@ xyplot(meanSteps ~ interval | dayType,
        layout = c(1,2), 
        ylab = "Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
